@@ -1,8 +1,7 @@
-version: '3'
 services:
-  formatif-dev-container:
-    container_name: formatif-dev-container
-    image: formatif-devcontainer:9-dev
+  formatif-dev-container-v9:
+    container_name: formatif-dev-container-v9
+    image: lmsdoubtfire/formatif-devcontainer:9-dev
     build:
       context: ../
       dockerfile: dev.Dockerfile
@@ -10,11 +9,10 @@ services:
       # Mounts the project folder to '/workspace'. While this file is in .devcontainer,
       # mounts are relative to the first file in the list, which is a level up.
       - ..:/workspace:cached
-      - formatif-dev-tmp:/workspace/tmp
-      - formatif-dev-student-work:/student-work
-      - df9-doubtfire-web-node_modules:/workspace/doubtfire-web/node_modules
-      - df9-formatif-dev-database:/var/lib/mysql
-      - df9-gems:/home/vscode/.gems
+      - formatif-v9-tmp:/workspace/tmp
+      - formatif-v9-student-work:/student-work
+      - formatif-v9-web-node_modules:/workspace/doubtfire-web/node_modules
+      - formatif-v9-gems:/home/vscode/.gems
     ports:
       - "9876:9876"
       - "4200:4200"
@@ -23,11 +21,20 @@ services:
     command: /bin/sh -c "while sleep 5000; do :; done"
     env_file:
       - devcontainer.env
+    depends_on:
+      - dev-db-v9
+  dev-db-v9:
+    container_name: doubtfire-dev-db-v9
+    image: mariadb:10
+    restart: always
+    volumes:
+      - formatif-v9-dev-database:/var/lib/mysql
+    env_file:
+      - devcontainer.env
 
 volumes:
-  ws_node_modules:
-  web_node_modules:
-  formatif_tmp_compose:
-  formatif_student-work_compose:
-  formatif_db_compose:
-  formatif_gems_compose:
+  formatif-v9-tmp:
+  formatif-v9-student-work:
+  formatif-v9-web-node_modules:
+  formatif-v9-dev-database:
+  formatif-v9-gems:
